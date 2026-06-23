@@ -28,7 +28,7 @@ COL_SITE_ID = 1
 COL_SITE_NAME = 2
 COL_FOLDER_LINK = 16
 
-MAX_SITE = 15
+MAX_SITE = 50
 
 # COVER
 COVER_CLEAR_RECT = fitz.Rect(35, 350, 560, 485)
@@ -305,7 +305,7 @@ def generate_pdf(site, work_dir, output_dir):
 # ============================================================
 
 site_input = st.text_area(
-    "Masukkan Site ID maksimal 15",
+    "Masukkan Site ID maksimal 50",
     height=170,
     placeholder="AM16224669368205N\nAM16224669328205N"
 )
