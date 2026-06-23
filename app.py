@@ -35,9 +35,9 @@ COVER_CLEAR_RECT = fitz.Rect(35, 330, 560, 430)
 COVER_LINE_1_RECT = fitz.Rect(60, 365, 540, 395)
 COVER_LINE_2_RECT = fitz.Rect(60, 395, 540, 430)
 
-BEFORE_RECT = fitz.Rect(50, 80, 573, 402)
-AFTER_RECT = fitz.Rect(64, 421, 557, 731)
-GRAFIK_RECT = fitz.Rect(36, 61, 559, 302)
+BEFORE_RECT = fitz.Rect(35, 55, 560, 370)
+AFTER_RECT  = fitz.Rect(35, 400, 560, 690)
+GRAFIK_RECT = fitz.Rect(35, 95, 560, 650)
 
 
 # ============================================================
