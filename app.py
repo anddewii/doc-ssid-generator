@@ -31,13 +31,13 @@ COL_FOLDER_LINK = 16
 
 MAX_SITE = 15
 
-COVER_CLEAR_RECT = fitz.Rect(50, 390, 560, 505)
-COVER_LINE_1_RECT = fitz.Rect(60, 405, 540, 440)
-COVER_LINE_2_RECT = fitz.Rect(60, 440, 540, 495)
+COVER_CLEAR_RECT = fitz.Rect(35, 330, 560, 430)
+COVER_LINE_1_RECT = fitz.Rect(60, 365, 540, 395)
+COVER_LINE_2_RECT = fitz.Rect(60, 395, 540, 430)
 
-BEFORE_RECT = fitz.Rect(60, 150, 535, 360)
-AFTER_RECT = fitz.Rect(60, 455, 535, 725)
-GRAFIK_RECT = fitz.Rect(45, 145, 550, 690)
+BEFORE_RECT = fitz.Rect(50, 80, 573, 402)
+AFTER_RECT = fitz.Rect(64, 421, 557, 731)
+GRAFIK_RECT = fitz.Rect(36, 61, 559, 302)
 
 
 # ============================================================
@@ -249,35 +249,35 @@ def generate_pdf(site, work_dir, output_dir):
     # PAGE 1 - COVER
     page1 = doc[0]
 
-    page1.draw_rect(
-        COVER_CLEAR_RECT,
-        color=(1, 1, 1),
-        fill=(1, 1, 1)
-    )
+   page1.draw_rect(
+    COVER_CLEAR_RECT,
+    color=(1, 1, 1),
+    fill=(1, 1, 1)
+)
 
-    page1.insert_textbox(
-        COVER_LINE_1_RECT,
-        f"{no_tracker}. {site_id}",
-        fontsize=18,
-        fontname="helv",
-        align=1,
-        color=(0, 0, 0)
-    )
+page1.insert_textbox(
+    COVER_LINE_1_RECT,
+    f"{no_tracker}. {site_id}",
+    fontsize=16,
+    fontname="helv",
+    align=1,
+    color=(0, 0, 0)
+)
 
-    page1.insert_textbox(
-        COVER_LINE_2_RECT,
-        site_name,
-        fontsize=18,
-        fontname="helv",
-        align=1,
-        color=(0, 0, 0)
-    )
+page1.insert_textbox(
+    COVER_LINE_2_RECT,
+    site_name,
+    fontsize=16,
+    fontname="helv",
+    align=1,
+    color=(0, 0, 0)
+)
 
     # PAGE 2 - BEFORE AFTER
     page2 = doc[1]
 
-    insert_image(page2, str(before_path), BEFORE_RECT)
-    insert_image(page2, str(after_path), AFTER_RECT)
+   insert_image(page2, str(before_path), BEFORE_RECT)
+   insert_image(page2, str(after_path), AFTER_RECT)
 
     # PAGE 3 - GRAFIK
     page3 = doc[2]
