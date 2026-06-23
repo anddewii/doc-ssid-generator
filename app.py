@@ -6,55 +6,100 @@ import shutil
 import tempfile
 from pathlib import Path
 
+import fitz
 import pandas as pd
-import fitz  # PyMuPDF
-import gdown
 import streamlit as st
+
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
+
 
 # ============================================================
 # CONFIG
 # ============================================================
+
 SHEET_ID = "17jaV5RykOT0SPZXRWoKO_UP7yNrpUq9hIXGAn-6ONPI"
 GID = "0"
+
 TEMPLATE_PDF = "TAMPLATE PERUBAHAN SSID AP1.pdf"
 
-# Mapping kolom database sesuai format Anda
-COL_NO_TRACKER = 0     # A = No Tracker PMO, contoh: 3749
-COL_SITE_ID = 1        # B = Site ID, contoh: AM16224669368205N
-COL_SITE_NAME = 2      # C = Site Name
-COL_FOLDER_LINK = 16   # Q = Link Dokumen
+COL_NO_TRACKER = 0
+COL_SITE_ID = 1
+COL_SITE_NAME = 2
+COL_FOLDER_LINK = 16
 
 MAX_SITE = 15
 
-# Koordinat PDF. Jika gambar kurang pas, ubah angka Rect di sini saja.
 COVER_CLEAR_RECT = fitz.Rect(50, 390, 560, 505)
 COVER_LINE_1_RECT = fitz.Rect(60, 405, 540, 440)
 COVER_LINE_2_RECT = fitz.Rect(60, 440, 540, 495)
+
 BEFORE_RECT = fitz.Rect(60, 150, 535, 360)
 AFTER_RECT = fitz.Rect(60, 455, 535, 725)
 GRAFIK_RECT = fitz.Rect(45, 145, 550, 690)
 
+
 # ============================================================
-# UI CONFIG
+# UI
 # ============================================================
+
 st.set_page_config(
     page_title="RTGS Report Generator",
     page_icon="📄",
-    layout="centered",
+    layout="centered"
 )
 
 st.title("📄 RTGS Report Generator")
 st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
 
+
 # ============================================================
-# HELPERS
+# AUTH GOOGLE SERVICE ACCOUNT
 # ============================================================
+
+@st.cache_resource
+def get_google_services():
+    creds_dict = dict(st.secrets["gcp_service_account"])
+
+    scopes = [
+        "https://www.googleapis.com/auth/drive.readonly",
+        "https://www.googleapis.com/auth/spreadsheets.readonly",
+    ]
+
+    creds = service_account.Credentials.from_service_account_info(
+        creds_dict,
+        scopes=scopes
+    )
+
+    drive_service = build("drive", "v3", credentials=creds)
+    return drive_service
+
+
+drive_service = get_google_services()
+
+
+# ============================================================
+# LOAD DATABASE
+# ============================================================
+
 @st.cache_data(ttl=300)
 def load_database():
     url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={GID}"
     df = pd.read_csv(url, dtype=str).fillna("")
     return df
 
+
+try:
+    df = load_database()
+except Exception as e:
+    st.error(f"Gagal membaca database Google Sheet: {e}")
+    st.stop()
+
+
+# ============================================================
+# HELPERS
+# ============================================================
 
 def parse_site_input(text):
     items = re.split(r"[\n,;]+", text)
@@ -65,84 +110,150 @@ def clean_filename(text):
     return re.sub(r'[\\/*?:"<>|]', "", str(text)).strip()
 
 
-def find_site(df, site_id):
+def extract_folder_id(link):
+    link = str(link)
+
+    match = re.search(r"/folders/([a-zA-Z0-9_-]+)", link)
+    if match:
+        return match.group(1)
+
+    match = re.search(r"id=([a-zA-Z0-9_-]+)", link)
+    if match:
+        return match.group(1)
+
+    return None
+
+
+def find_site(site_id):
     site_id = str(site_id).strip().upper()
+
     for _, row in df.iterrows():
         sheet_site_id = str(row.iloc[COL_SITE_ID]).strip().upper()
+
         if sheet_site_id == site_id:
             return {
                 "no_tracker": str(row.iloc[COL_NO_TRACKER]).strip(),
                 "site_id": str(row.iloc[COL_SITE_ID]).strip(),
                 "site_name": str(row.iloc[COL_SITE_NAME]).strip(),
-                "folder_link": str(row.iloc[COL_FOLDER_LINK]).strip(),
+                "folder_link": str(row.iloc[COL_FOLDER_LINK]).strip()
             }
+
     return None
 
 
-def download_public_folder(folder_link, target_dir):
-    if os.path.exists(target_dir):
-        shutil.rmtree(target_dir)
-    os.makedirs(target_dir, exist_ok=True)
+def list_drive_files(folder_id):
+    files = []
+    page_token = None
 
-    result = gdown.download_folder(
-        url=folder_link,
-        output=target_dir,
-        quiet=True,
-        use_cookies=False,
-    )
-    return result
+    while True:
+        response = drive_service.files().list(
+            q=f"'{folder_id}' in parents and trashed=false",
+            fields="nextPageToken, files(id, name, mimeType)",
+            pageToken=page_token,
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True
+        ).execute()
+
+        files.extend(response.get("files", []))
+        page_token = response.get("nextPageToken")
+
+        if not page_token:
+            break
+
+    return files
 
 
-def find_images(folder_path):
+def find_required_images(folder_id):
+    files = list_drive_files(folder_id)
+
     before = None
     after = None
     grafik = None
 
-    for root, _, files in os.walk(folder_path):
-        for file in files:
-            name = file.lower()
-            full_path = os.path.join(root, file)
+    for f in files:
+        name = f["name"].lower()
 
-            if "_before" in name and before is None:
-                before = full_path
-            elif "_after" in name and after is None:
-                after = full_path
-            elif "grafik" in name and grafik is None:
-                grafik = full_path
+        if "_before" in name and before is None:
+            before = f
+        elif "_after" in name and after is None:
+            after = f
+        elif "grafik" in name and grafik is None:
+            grafik = f
 
     return before, after, grafik
 
 
+def download_drive_file(file_id, output_path):
+    request = drive_service.files().get_media(fileId=file_id)
+
+    with io.FileIO(output_path, "wb") as fh:
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+
+        while not done:
+            _, done = downloader.next_chunk()
+
+    return output_path
+
+
 def insert_image(page, image_path, rect):
-    page.insert_image(rect, filename=image_path, keep_proportion=True)
+    page.insert_image(
+        rect,
+        filename=image_path,
+        keep_proportion=True
+    )
 
 
-def generate_pdf(site, base_work_dir):
+# ============================================================
+# GENERATE PDF
+# ============================================================
+
+def generate_pdf(site, work_dir, output_dir):
     no_tracker = site["no_tracker"]
     site_id = site["site_id"]
     site_name = site["site_name"]
     folder_link = site["folder_link"]
 
-    site_work_dir = os.path.join(base_work_dir, clean_filename(site_id))
-    download_public_folder(folder_link, site_work_dir)
+    folder_id = extract_folder_id(folder_link)
 
-    before_img, after_img, grafik_img = find_images(site_work_dir)
+    if not folder_id:
+        raise Exception("Folder ID tidak valid di kolom Q")
 
-    if before_img is None:
+    before_file, after_file, grafik_file = find_required_images(folder_id)
+
+    if before_file is None:
         raise Exception("File *_before tidak ditemukan")
-    if after_img is None:
+
+    if after_file is None:
         raise Exception("File *_after tidak ditemukan")
-    if grafik_img is None:
-        raise Exception("File Grafik Zabbix tidak ditemukan")
+
+    if grafik_file is None:
+        raise Exception("File grafik tidak ditemukan")
+
+    site_work_dir = Path(work_dir) / site_id
+    site_work_dir.mkdir(parents=True, exist_ok=True)
+
+    before_path = site_work_dir / "before.png"
+    after_path = site_work_dir / "after.png"
+    grafik_path = site_work_dir / "grafik.png"
+
+    download_drive_file(before_file["id"], str(before_path))
+    download_drive_file(after_file["id"], str(after_path))
+    download_drive_file(grafik_file["id"], str(grafik_path))
 
     output_name = clean_filename(f"{no_tracker}. {site_id} {site_name}.pdf")
-    output_pdf = os.path.join(base_work_dir, output_name)
+    output_pdf = Path(output_dir) / output_name
 
     doc = fitz.open(TEMPLATE_PDF)
 
     # PAGE 1 - COVER
     page1 = doc[0]
-    page1.draw_rect(COVER_CLEAR_RECT, color=(1, 1, 1), fill=(1, 1, 1))
+
+    page1.draw_rect(
+        COVER_CLEAR_RECT,
+        color=(1, 1, 1),
+        fill=(1, 1, 1)
+    )
 
     page1.insert_textbox(
         COVER_LINE_1_RECT,
@@ -150,7 +261,7 @@ def generate_pdf(site, base_work_dir):
         fontsize=18,
         fontname="helv-bold",
         align=1,
-        color=(0, 0, 0),
+        color=(0, 0, 0)
     )
 
     page1.insert_textbox(
@@ -159,60 +270,37 @@ def generate_pdf(site, base_work_dir):
         fontsize=18,
         fontname="helv-bold",
         align=1,
-        color=(0, 0, 0),
+        color=(0, 0, 0)
     )
 
-    # PAGE 2 - BEFORE & AFTER
+    # PAGE 2 - BEFORE AFTER
     page2 = doc[1]
-    insert_image(page2, before_img, BEFORE_RECT)
-    insert_image(page2, after_img, AFTER_RECT)
+
+    insert_image(page2, str(before_path), BEFORE_RECT)
+    insert_image(page2, str(after_path), AFTER_RECT)
 
     # PAGE 3 - GRAFIK
     page3 = doc[2]
-    insert_image(page3, grafik_img, GRAFIK_RECT)
 
-    doc.save(output_pdf)
+    insert_image(page3, str(grafik_path), GRAFIK_RECT)
+
+    doc.save(str(output_pdf))
     doc.close()
 
-    return output_pdf
+    return str(output_pdf)
 
-
-def make_zip(pdf_paths, logs):
-    mem_zip = io.BytesIO()
-    with zipfile.ZipFile(mem_zip, "w", zipfile.ZIP_DEFLATED) as z:
-        for pdf in pdf_paths:
-            z.write(pdf, os.path.basename(pdf))
-        z.writestr("log.txt", "\n".join(logs))
-    mem_zip.seek(0)
-    return mem_zip
 
 # ============================================================
 # APP
 # ============================================================
-with st.expander("Syarat agar aplikasi bisa berjalan", expanded=False):
-    st.markdown(
-        """
-        - Nama file di folder site harus mengandung:
-          - `_before`
-          - `_after`
-          - `grafik`
-        """
-    )
 
-try:
-    df = load_database()
-    st.success(f"Database terbaca: {len(df):,} baris")
-except Exception as e:
-    st.error(f"Gagal membaca Google Sheet: {e}")
-    st.stop()
-
-site_text = st.text_area(
+site_input = st.text_area(
     "Masukkan Site ID maksimal 15",
-    height=180,
-    placeholder="Contoh:\nAM16224669368205N\nAM16224669328205N",
+    height=170,
+    placeholder="AM16224669368205N\nAM16224669328205N"
 )
 
-col1, col2 = st.columns([1, 1])
+col1, col2 = st.columns(2)
 
 with col1:
     preview_btn = st.button("Preview Site", use_container_width=True)
@@ -220,35 +308,29 @@ with col1:
 with col2:
     generate_btn = st.button("Generate PDF", type="primary", use_container_width=True)
 
-site_ids = parse_site_input(site_text)
 
 if preview_btn:
-    if not site_ids:
+    site_ids = parse_site_input(site_input)
+
+    if len(site_ids) == 0:
         st.warning("Site ID belum diisi.")
     elif len(site_ids) > MAX_SITE:
         st.error("Maksimal 15 Site ID.")
     else:
-        preview_rows = []
-        for sid in site_ids:
-            site = find_site(df, sid)
+        st.subheader("Preview")
+        for site_id in site_ids:
+            site = find_site(site_id)
+
             if site:
-                preview_rows.append({
-                    "Site ID": site["site_id"],
-                    "No Tracker": site["no_tracker"],
-                    "Site Name": site["site_name"],
-                    "Status": "Ditemukan",
-                })
+                st.success(f"{site['site_id']} - {site['site_name']}")
             else:
-                preview_rows.append({
-                    "Site ID": sid,
-                    "No Tracker": "",
-                    "Site Name": "",
-                    "Status": "Tidak ditemukan",
-                })
-        st.dataframe(pd.DataFrame(preview_rows), use_container_width=True)
+                st.error(f"{site_id} tidak ditemukan di database")
+
 
 if generate_btn:
-    if not site_ids:
+    site_ids = parse_site_input(site_input)
+
+    if len(site_ids) == 0:
         st.warning("Site ID belum diisi.")
         st.stop()
 
@@ -256,48 +338,63 @@ if generate_btn:
         st.error("Maksimal 15 Site ID.")
         st.stop()
 
-    if not Path(TEMPLATE_PDF).exists():
-        st.error(f"Template PDF tidak ditemukan: {TEMPLATE_PDF}")
-        st.stop()
-
     generated_files = []
-    logs = []
+    log = []
 
     progress = st.progress(0)
-    status_box = st.empty()
+    status = st.empty()
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        for idx, sid in enumerate(site_ids, start=1):
-            status_box.info(f"Memproses {sid} ({idx}/{len(site_ids)})...")
+        work_dir = Path(tmpdir) / "work"
+        output_dir = Path(tmpdir) / "output"
+
+        work_dir.mkdir(parents=True, exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        for i, site_id in enumerate(site_ids, start=1):
+            status.info(f"Memproses {site_id} ({i}/{len(site_ids)})...")
 
             try:
-                site = find_site(df, sid)
+                site = find_site(site_id)
+
                 if not site:
-                    logs.append(f"FAILED - {sid}: Site ID tidak ditemukan di database")
-                    progress.progress(idx / len(site_ids))
+                    log.append(f"FAILED - {site_id}: Site ID tidak ditemukan di database")
                     continue
 
-                pdf_path = generate_pdf(site, tmpdir)
+                pdf_path = generate_pdf(site, work_dir, output_dir)
                 generated_files.append(pdf_path)
-                logs.append(f"DONE - {sid}: {os.path.basename(pdf_path)}")
+                log.append(f"DONE - {site_id}: {os.path.basename(pdf_path)}")
 
             except Exception as e:
-                logs.append(f"FAILED - {sid}: {str(e)}")
+                log.append(f"FAILED - {site_id}: {str(e)}")
 
-            progress.progress(idx / len(site_ids))
+            progress.progress(i / len(site_ids))
 
-        if generated_files:
-            zip_data = make_zip(generated_files, logs)
-            st.success(f"Selesai. {len(generated_files)} PDF berhasil dibuat.")
-            st.download_button(
-                label="Download ZIP",
-                data=zip_data,
-                file_name="RTGS_REPORT_RESULT.zip",
-                mime="application/zip",
-                use_container_width=True,
-            )
-        else:
+        if not generated_files:
             st.error("Tidak ada PDF yang berhasil dibuat.")
+            st.subheader("Log")
+            st.code("\n".join(log))
+            st.stop()
+
+        zip_buffer = io.BytesIO()
+
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as z:
+            for pdf in generated_files:
+                z.write(pdf, os.path.basename(pdf))
+
+            z.writestr("log.txt", "\n".join(log))
+
+        zip_buffer.seek(0)
+
+        st.success(f"{len(generated_files)} PDF berhasil dibuat.")
+
+        st.download_button(
+            label="Download ZIP",
+            data=zip_buffer,
+            file_name="RTGS_REPORT_RESULT.zip",
+            mime="application/zip",
+            use_container_width=True
+        )
 
         st.subheader("Log")
-        st.code("\n".join(logs))
+        st.code("\n".join(log))
