@@ -192,12 +192,11 @@ def make_zip(pdf_paths, logs):
 with st.expander("Syarat agar aplikasi bisa berjalan", expanded=False):
     st.markdown(
         """
-        - Google Sheet harus **Anyone with the link → Viewer**.
-        - Folder Google Drive pada kolom Q harus **Anyone with the link → Viewer**.
         - Nama file di folder site harus mengandung:
           - `_before`
           - `_after`
           - `grafik`
+        - Goodluck ABG.
         """
     )
 
