@@ -40,7 +40,7 @@ BEFORE_RECT = fitz.Rect(55, 100, 540, 360)
 AFTER_RECT  = fitz.Rect(55, 465, 540, 705)
 
 # PAGE 3
-GRAFIK_RECT = fitz.Rect(35, 90, 560, 500)
+GRAFIK_RECT = fitz.Rect(35, 70, 560, 500)
 
 
 # ============================================================
