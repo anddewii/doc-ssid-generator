@@ -277,8 +277,17 @@ def generate_pdf(site, work_dir, output_dir):
     # PAGE 2 - BEFORE AFTER
     page2 = doc[1]
 
-    insert_image(page2, str(before_path), BEFORE_RECT)
-    insert_image(page2, str(after_path), AFTER_RECT)
+    page2.insert_image(
+      BEFORE_RECT,
+      stream=before_bytes,
+      keep_proportion=True
+    )
+
+    page2.insert_image(
+      AFTER_RECT,
+      stream=after_bytes,
+      keep_proportion=True
+    )
 
     # PAGE 3 - GRAFIK
     page3 = doc[2]
