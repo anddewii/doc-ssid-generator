@@ -249,30 +249,31 @@ def generate_pdf(site, work_dir, output_dir):
     # PAGE 1 - COVER
     page1 = doc[0]
 
-   page1.draw_rect(
-    COVER_CLEAR_RECT,
-    color=(1, 1, 1),
-    fill=(1, 1, 1)
-)
+    page1.draw_rect(
+        COVER_CLEAR_RECT,
+        color=(1, 1, 1),
+        fill=(1, 1, 1)
+    )
 
-page1.insert_textbox(
-    COVER_LINE_1_RECT,
-    f"{no_tracker}. {site_id}",
-    fontsize=16,
-    fontname="helv",
-    align=1,
-    color=(0, 0, 0)
-)
+    page1.insert_textbox(
+        COVER_LINE_1_RECT,
+        f"{no_tracker}. {site_id}",
+        fontsize=16,
+        fontname="helv",
+        align=1,
+        color=(0, 0, 0)
+    )
 
-page1.insert_textbox(
-    COVER_LINE_2_RECT,
-    site_name,
-    fontsize=16,
-    fontname="helv",
-    align=1,
-    color=(0, 0, 0)
-)
+    page1.insert_textbox(
+        COVER_LINE_2_RECT,
+        site_name,
+        fontsize=16,
+        fontname="helv",
+        align=1,
+        color=(0, 0, 0)
+    )
 
+  
     # PAGE 2 - BEFORE AFTER
     page2 = doc[1]
 
