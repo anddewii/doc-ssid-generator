@@ -13,8 +13,6 @@ Aplikasi gratis untuk generate PDF Perubahan SSID AP1 dari Google Sheet + Google
 
 ## Syarat
 
-- Google Sheet: Anyone with the link -> Viewer.
-- Folder Drive pada kolom Q: Anyone with the link -> Viewer.
 - File di folder site harus mengandung:
   - `_before`
   - `_after`
