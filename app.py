@@ -259,7 +259,7 @@ def generate_pdf(site, work_dir, output_dir):
         COVER_LINE_1_RECT,
         f"{no_tracker}. {site_id}",
         fontsize=18,
-        fontname="helv-bold",
+        fontname="helv",
         align=1,
         color=(0, 0, 0)
     )
@@ -268,7 +268,7 @@ def generate_pdf(site, work_dir, output_dir):
         COVER_LINE_2_RECT,
         site_name,
         fontsize=18,
-        fontname="helv-bold",
+        fontname="helv",
         align=1,
         color=(0, 0, 0)
     )
