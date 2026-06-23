@@ -2,7 +2,6 @@ import os
 import re
 import io
 import zipfile
-import shutil
 import tempfile
 from pathlib import Path
 
@@ -31,13 +30,15 @@ COL_FOLDER_LINK = 16
 
 MAX_SITE = 15
 
-COVER_CLEAR_RECT = fitz.Rect(35, 330, 560, 430)
-COVER_LINE_1_RECT = fitz.Rect(60, 365, 540, 395)
-COVER_LINE_2_RECT = fitz.Rect(60, 395, 540, 430)
+# COVER
+COVER_CLEAR_RECT = fitz.Rect(40, 405, 555, 500)
+COVER_LINE_1_RECT = fitz.Rect(60, 420, 540, 455)
+COVER_LINE_2_RECT = fitz.Rect(60, 455, 540, 495)
 
-BEFORE_RECT = fitz.Rect(35, 55, 560, 370)
-AFTER_RECT  = fitz.Rect(35, 400, 560, 690)
-GRAFIK_RECT = fitz.Rect(35, 95, 560, 650)
+# PAGE 2 & 3
+BEFORE_RECT = fitz.Rect(65, 95, 530, 330)
+AFTER_RECT  = fitz.Rect(65, 405, 530, 665)
+GRAFIK_RECT = fitz.Rect(45, 130, 550, 520)
 
 
 # ============================================================
@@ -55,7 +56,7 @@ st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
 
 
 # ============================================================
-# AUTH GOOGLE SERVICE ACCOUNT
+# GOOGLE SERVICE ACCOUNT
 # ============================================================
 
 @st.cache_resource
@@ -98,7 +99,7 @@ except Exception as e:
 
 
 # ============================================================
-# HELPERS
+# HELPER
 # ============================================================
 
 def parse_site_input(text):
@@ -199,7 +200,7 @@ def download_drive_file(file_id, output_path):
 def insert_image(page, image_path, rect):
     page.insert_image(
         rect,
-        filename=image_path,
+        filename=str(image_path),
         keep_proportion=True
     )
 
@@ -246,7 +247,9 @@ def generate_pdf(site, work_dir, output_dir):
 
     doc = fitz.open(TEMPLATE_PDF)
 
+    # ========================================================
     # PAGE 1 - COVER
+    # ========================================================
     page1 = doc[0]
 
     page1.draw_rect(
@@ -273,26 +276,20 @@ def generate_pdf(site, work_dir, output_dir):
         color=(0, 0, 0)
     )
 
-  
-    # PAGE 2 - BEFORE AFTER
+    # ========================================================
+    # PAGE 2 - BEFORE & AFTER
+    # ========================================================
     page2 = doc[1]
 
-    page2.insert_image(
-      BEFORE_RECT,
-      stream=before_bytes,
-      keep_proportion=True
-    )
+    insert_image(page2, before_path, BEFORE_RECT)
+    insert_image(page2, after_path, AFTER_RECT)
 
-    page2.insert_image(
-      AFTER_RECT,
-      stream=after_bytes,
-      keep_proportion=True
-    )
-
+    # ========================================================
     # PAGE 3 - GRAFIK
+    # ========================================================
     page3 = doc[2]
 
-    insert_image(page3, str(grafik_path), GRAFIK_RECT)
+    insert_image(page3, grafik_path, GRAFIK_RECT)
 
     doc.save(str(output_pdf))
     doc.close()
