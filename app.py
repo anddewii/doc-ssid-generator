@@ -277,8 +277,8 @@ def generate_pdf(site, work_dir, output_dir):
     # PAGE 2 - BEFORE AFTER
     page2 = doc[1]
 
-   insert_image(page2, str(before_path), BEFORE_RECT)
-   insert_image(page2, str(after_path), AFTER_RECT)
+    insert_image(page2, str(before_path), BEFORE_RECT)
+    insert_image(page2, str(after_path), AFTER_RECT)
 
     # PAGE 3 - GRAFIK
     page3 = doc[2]
