@@ -196,7 +196,6 @@ with st.expander("Syarat agar aplikasi bisa berjalan", expanded=False):
           - `_before`
           - `_after`
           - `grafik`
-       ** 4222 SITEEE SEMANGATT**
         """
     )
 
