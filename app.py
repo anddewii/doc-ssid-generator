@@ -31,14 +31,16 @@ COL_FOLDER_LINK = 16
 MAX_SITE = 15
 
 # COVER
-COVER_CLEAR_RECT = fitz.Rect(40, 405, 555, 500)
-COVER_LINE_1_RECT = fitz.Rect(60, 420, 540, 455)
-COVER_LINE_2_RECT = fitz.Rect(60, 455, 540, 495)
+COVER_CLEAR_RECT = fitz.Rect(35, 350, 560, 485)
+COVER_LINE_1_RECT = fitz.Rect(60, 405, 540, 435)
+COVER_LINE_2_RECT = fitz.Rect(60, 435, 540, 475)
 
-# PAGE 2 & 3
-BEFORE_RECT = fitz.Rect(65, 95, 530, 330)
-AFTER_RECT  = fitz.Rect(65, 405, 530, 665)
-GRAFIK_RECT = fitz.Rect(45, 130, 550, 520)
+# PAGE 2
+BEFORE_RECT = fitz.Rect(55, 95, 540, 335)
+AFTER_RECT  = fitz.Rect(55, 455, 540, 690)
+
+# PAGE 3
+GRAFIK_RECT = fitz.Rect(45, 150, 550, 500)
 
 
 # ============================================================
@@ -255,7 +257,8 @@ def generate_pdf(site, work_dir, output_dir):
     page1.draw_rect(
         COVER_CLEAR_RECT,
         color=(1, 1, 1),
-        fill=(1, 1, 1)
+        fill=(1, 1, 1),
+        overlay=True
     )
 
     page1.insert_textbox(
