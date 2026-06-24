@@ -60,32 +60,28 @@ st.markdown("""
 .logo-container {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 30px;
     margin-top: 20px;
     margin-bottom: 20px;
 }
 
 .logo-kucing {
     width: 220px;
-    height: auto;
     border-radius: 10px;
 }
 
 .logo-coach {
     width: 220px;
-    height: auto;
     border-radius: 10px;
 }
 </style>
-""", unsafe_allow_html=True)
 
-st.markdown("""
 <div class="logo-container">
     <img class="logo-kucing"
-    src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo.png">
+         src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo.png">
 
     <img class="logo-coach"
-    src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo2.png">
+         src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo2.png">
 </div>
 """, unsafe_allow_html=True)
 # ============================================================
