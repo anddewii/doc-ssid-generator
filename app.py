@@ -193,9 +193,9 @@ def find_required_images(folder_id):
     for f in files:
         name = f["name"].lower()
 
-        if "_before" in name and before is None:
+        if "before" in name and before is None:
             before = f
-        elif "_after" in name and after is None:
+        elif "after" in name and after is None:
             after = f
         elif "grafik" in name and grafik is None:
             grafik = f
@@ -242,10 +242,10 @@ def generate_pdf(site, work_dir, output_dir):
     before_file, after_file, grafik_file = find_required_images(folder_id)
 
     if before_file is None:
-        raise Exception("File *_before tidak ditemukan")
+        raise Exception("File *before tidak ditemukan")
 
     if after_file is None:
-        raise Exception("File *_after tidak ditemukan")
+        raise Exception("File *after tidak ditemukan")
 
     if grafik_file is None:
         raise Exception("File grafik tidak ditemukan")
