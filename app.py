@@ -61,15 +61,27 @@ from pathlib import Path
 logo1 = Image.open("logo.png")
 logo2 = Image.open("logo2.png")
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.image("logo.png", width=250)
+    st.image(
+        "https://media1.tenor.com/m/Pq5EqV3tfrMAAAAC/cat-scream-cat-screaming.gif",
+        width=250
+    )
 
 with col2:
-    st.image("logo2.png", width=250)
+    st.image(
+        "https://media1.tenor.com/m/u7nO0ymB7i0AAAAd/exploding-cat-cat.gif",
+        width=250
+    )
 
 with col3:
+    st.image(
+        "https://media1.tenor.com/m/4aCkAvBWvxIAAAAC/cat.gif",
+        width=250
+    )
+
+with col4:
     st.image(
         "https://media1.tenor.com/m/Xn3TfHpAJiMAAAAd/scuba-cat-scuba.gif",
         width=250
