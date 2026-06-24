@@ -61,13 +61,19 @@ from pathlib import Path
 logo1 = Image.open("logo.png")
 logo2 = Image.open("logo2.png")
 
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.image(logo1, width=250)
+    st.image("logo.png", width=250)
 
 with col2:
-    st.image(logo2, width=280)
+    st.image("logo2.png", width=250)
+
+with col3:
+    st.image(
+        "https://media1.tenor.com/m/Xn3TfHpAJiMAAAAd/scuba-cat-scuba.gif",
+        width=250
+    )
 # ============================================================
 # GOOGLE SERVICE ACCOUNT
 # ============================================================
