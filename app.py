@@ -55,18 +55,19 @@ st.set_page_config(
 
 st.title("📄 Doc Report Generator")
 st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
+from PIL import Image
 from pathlib import Path
 
-logo1_path = Path(__file__).parent / "logo.png"
-logo2_path = Path(__file__).parent / "logo2.png"
+logo1 = Image.open("logo.png")
+logo2 = Image.open("logo2.png")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.image(str(logo1_path), width=250)
+    st.image(logo1, width=250)
 
 with col2:
-    st.image(str(logo2_path), width=250)
+    st.image(logo2, width=250)
 # ============================================================
 # GOOGLE SERVICE ACCOUNT
 # ============================================================
