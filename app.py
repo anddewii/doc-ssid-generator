@@ -67,7 +67,7 @@ with col1:
     st.image(logo1, width=250)
 
 with col2:
-    st.image(logo2, width=275)
+    st.image(logo2, width=280)
 # ============================================================
 # GOOGLE SERVICE ACCOUNT
 # ============================================================
