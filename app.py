@@ -57,17 +57,28 @@ st.title("📄 RTGS Report Generator")
 st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
 st.markdown("""
 <style>
-.bottom-left-logo {
+.top-right-logo1 {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
-    width: 120px;
+    top: 20px;
+    right: 180px;
+    width: 90px;
+    z-index: 9999;
+}
+
+.top-right-logo2 {
+    position: fixed;
+    top: 20px;
+    right: 40px;
+    width: 90px;
     z-index: 9999;
 }
 </style>
 
-<img class="bottom-left-logo"
+<img class="top-right-logo1"
 src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo.png">
+
+<img class="top-right-logo2"
+src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo2.png">
 """, unsafe_allow_html=True)
 
 # ============================================================
