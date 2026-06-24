@@ -55,35 +55,18 @@ st.set_page_config(
 
 st.title("📄 Doc Report Generator")
 st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
-st.markdown("""
-<style>
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
+from pathlib import Path
 
-.logo-kucing {
-    width: 220px;
-    border-radius: 10px;
-}
+logo1_path = Path(__file__).parent / "logo.png"
+logo2_path = Path(__file__).parent / "logo2.png"
 
-.logo-coach {
-    width: 220px;
-    border-radius: 10px;
-}
-</style>
+col_empty1, col_logo1, col_logo2, col_empty2 = st.columns([1, 1, 1, 1])
 
-<div class="logo-container">
-    <img class="logo-kucing"
-         src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo.png">
+with col_logo1:
+    st.image(str(logo1_path), width=220)
 
-    <img class="logo-coach"
-         src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo2.png">
-</div>
-""", unsafe_allow_html=True)
+with col_logo2:
+    st.image(str(logo2_path), width=220)
 # ============================================================
 # GOOGLE SERVICE ACCOUNT
 # ============================================================
