@@ -60,13 +60,13 @@ from pathlib import Path
 logo1_path = Path(__file__).parent / "logo.png"
 logo2_path = Path(__file__).parent / "logo2.png"
 
-col_empty1, col_logo1, col_logo2, col_empty2 = st.columns([1, 1, 1, 1])
+col1, col2 = st.columns(2)
 
-with col_logo1:
-    st.image(str(logo1_path), width=220)
+with col1:
+    st.image(str(logo1_path), width=250)
 
-with col_logo2:
-    st.image(str(logo2_path), width=220)
+with col2:
+    st.image(str(logo2_path), width=250)
 # ============================================================
 # GOOGLE SERVICE ACCOUNT
 # ============================================================
