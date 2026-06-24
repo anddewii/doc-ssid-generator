@@ -58,26 +58,20 @@ st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
 st.markdown("""
 <style>
 .logo-kiri {
-    position: fixed;
-    top: 15px;
-    left: 15px;
     width: 180px;
-    height: auto;
-    z-index: 9999;
+    height: 180px;
+    object-fit: contain;
 }
 
 .logo-kanan {
     position: fixed;
     top: 15px;
     right: 15px;
-    width: 180px;
+    width: 220px;
     height: auto;
+    max-height: 120px;
+    object-fit: contain;
     z-index: 9999;
-}
-
-/* Hilangkan margin bawaan Streamlit */
-.block-container {
-    padding-top: 3rem;
 }
 </style>
 
