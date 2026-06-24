@@ -55,7 +55,20 @@ st.set_page_config(
 
 st.title("📄 RTGS Report Generator")
 st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
+st.markdown("""
+<style>
+.bottom-left-logo {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 120px;
+    z-index: 9999;
+}
+</style>
 
+<img class="bottom-left-logo"
+src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo.png">
+""", unsafe_allow_html=True)
 
 # ============================================================
 # GOOGLE SERVICE ACCOUNT
