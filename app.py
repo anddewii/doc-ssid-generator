@@ -77,7 +77,7 @@ with col2:
 
 with col3:
     st.image(
-        "https://media1.tenor.com/m/4aCkAvBWvxIAAAAC/cat.gif",
+        "https://media1.tenor.com/m/NPVIhcsXdkAAAAAd/cat-ok.gif",
         width=250
     )
 
