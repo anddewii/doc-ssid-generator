@@ -53,33 +53,40 @@ st.set_page_config(
     layout="centered"
 )
 
-st.title("📄 RTGS Report Generator")
+st.title("📄 Doc Report Generator")
 st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
 st.markdown("""
 <style>
-.logo-kiri {
-    width: 180px;
-    height: 180px;
-    object-fit: contain;
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.logo-kanan {
-    position: fixed;
-    top: 15px;
-    right: 15px;
+.logo-kucing {
     width: 220px;
     height: auto;
-    max-height: 120px;
-    object-fit: contain;
-    z-index: 9999;
+    border-radius: 10px;
+}
+
+.logo-coach {
+    width: 220px;
+    height: auto;
+    border-radius: 10px;
 }
 </style>
+""", unsafe_allow_html=True)
 
-<img class="logo-kiri"
-src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo.png">
+st.markdown("""
+<div class="logo-container">
+    <img class="logo-kucing"
+    src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo.png">
 
-<img class="logo-kanan"
-src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo2.png">
+    <img class="logo-coach"
+    src="https://raw.githubusercontent.com/anddewii/doc-ssid-generator/main/logo2.png">
+</div>
 """, unsafe_allow_html=True)
 # ============================================================
 # GOOGLE SERVICE ACCOUNT
