@@ -55,37 +55,19 @@ st.set_page_config(
 
 st.title("📄 Doc Report Generator")
 st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
-from PIL import Image
-from pathlib import Path
 
-logo1 = Image.open("logo.png")
-logo2 = Image.open("logo2.png")
+gif_urls = [
+    "https://media1.tenor.com/m/Pq5EqV3tfrMAAAAC/cat-scream-cat-screaming.gif",
+    "https://media1.tenor.com/m/u7nO0ymB7i0AAAAd/exploding-cat-cat.gif",
+    "https://media1.tenor.com/m/NPVIhcsXdkAAAAAd/cat-ok.gif",
+    "https://media1.tenor.com/m/Xn3TfHpAJiMAAAAd/scuba-cat-scuba.gif",
+]
 
-col1, col2, col3, col4 = st.columns(4)
+cols = st.columns(4)
 
-with col1:
-    st.image(
-        "https://media1.tenor.com/m/Pq5EqV3tfrMAAAAC/cat-scream-cat-screaming.gif",
-        width=250
-    )
-
-with col2:
-    st.image(
-        "https://media1.tenor.com/m/u7nO0ymB7i0AAAAd/exploding-cat-cat.gif",
-        width=250
-    )
-
-with col3:
-    st.image(
-        "https://media1.tenor.com/m/NPVIhcsXdkAAAAAd/cat-ok.gif",
-        width=250
-    )
-
-with col4:
-    st.image(
-        "https://media1.tenor.com/m/Xn3TfHpAJiMAAAAd/scuba-cat-scuba.gif",
-        width=250
-    )
+for col, url in zip(cols, gif_urls):
+    with col:
+        st.image(url, width=190)
 # ============================================================
 # GOOGLE SERVICE ACCOUNT
 # ============================================================
@@ -354,7 +336,7 @@ if preview_btn:
     if len(site_ids) == 0:
         st.warning("Site ID belum diisi.")
     elif len(site_ids) > MAX_SITE:
-        st.error("Maksimal 15 Site ID.")
+        st.error(f"Maksimal {MAX_SITE} Site ID.")
     else:
         st.subheader("Preview")
         for site_id in site_ids:
