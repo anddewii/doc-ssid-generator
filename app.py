@@ -57,7 +57,7 @@ st.title("📄 Doc Report Generator")
 st.caption("Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive")
 
 gif_urls = [
-    "https://media1.tenor.com/m/Pq5EqV3tfrMAAAAC/cat-scream-cat-screaming.gif",
+    "https://media1.tenor.com/m/pI3Jq2cBj08AAAAd/cat-fighting-cat.gif",
     "https://media1.tenor.com/m/u7nO0ymB7i0AAAAd/exploding-cat-cat.gif",
     "https://media1.tenor.com/m/NPVIhcsXdkAAAAAd/cat-ok.gif",
     "https://media1.tenor.com/m/Xn3TfHpAJiMAAAAd/scuba-cat-scuba.gif",
