@@ -161,6 +161,47 @@ div[data-testid="stMetric"] {
     from {opacity:0; transform: translateY(16px);}
     to {opacity:1; transform: translateY(0);}
 }
+
+
+.cat-gallery-card {
+    background: rgba(255, 255, 255, 0.66);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.62);
+    border-radius: 28px;
+    padding: 22px 26px;
+    margin: 22px auto 26px auto;
+    width: fit-content;
+    max-width: 100%;
+    box-shadow: 0 18px 55px rgba(31, 38, 135, 0.12);
+    animation: fadeIn 0.7s ease-in-out;
+}
+
+.cat-row-clean {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cat-img-clean {
+    width: 165px;
+    height: 165px;
+    object-fit: cover;
+    border-radius: 24px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    transition: all .28s ease;
+}
+
+.cat-img-clean:hover {
+    transform: scale(1.045) rotate(-1deg);
+}
+
+textarea {
+    border-radius: 18px !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -190,12 +231,12 @@ def show_hero(status="sleepy"):
 
 def show_cat_gallery():
     st.markdown(f"""
-    <div class="glass-card">
-        <div class="cat-row">
-            <img src="{CAT_ANGRY}" class="cat-img">
-            <img src="{CAT_PANIC}" class="cat-img">
-            <img src="{CAT_HAPPY}" class="cat-img">
-            <img src="{CAT_SLEEPY}" class="cat-img">
+    <div class="cat-gallery-card">
+        <div class="cat-row-clean">
+            <img src="{CAT_ANGRY}" class="cat-img-clean">
+            <img src="{CAT_PANIC}" class="cat-img-clean">
+            <img src="{CAT_HAPPY}" class="cat-img-clean">
+            <img src="{CAT_SLEEPY}" class="cat-img-clean">
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -672,10 +713,8 @@ if preview_btn:
     site_ids = parse_site_input(site_input)
 
     if len(site_ids) == 0:
-        show_hero("panic")
         st.warning("Site ID belum diisi.")
     elif len(site_ids) > MAX_SITE:
-        show_hero("angry")
         st.error(f"Maksimal {MAX_SITE} Site ID.")
     else:
         preview_data = []
@@ -702,12 +741,10 @@ if generate_btn:
     site_ids = parse_site_input(site_input)
 
     if len(site_ids) == 0:
-        show_hero("panic")
         st.warning("Site ID belum diisi.")
         st.stop()
 
     if len(site_ids) > MAX_SITE:
-        show_hero("angry")
         st.error(f"Maksimal {MAX_SITE} Site ID.")
         st.stop()
 
