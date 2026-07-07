@@ -229,6 +229,26 @@ def show_hero(status="sleepy"):
     """, unsafe_allow_html=True)
 
 
+
+
+def show_result_cat_card(status="sleepy"):
+    """Tampilkan status kucing khusus di HASIL proses generate/preview."""
+    img, title, desc, css = get_cat_status(status)
+    st.markdown(f"""
+    <div class="glass-card">
+        <div class="hero-title">🐱 RTGS Report Generator</div>
+        <div class="hero-caption">Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive</div>
+        <div style="display:flex; gap:26px; align-items:center; flex-wrap:wrap; margin-top:20px;">
+            <img src="{img}" style="width:165px;height:165px;object-fit:cover;border-radius:24px;box-shadow:0 12px 28px rgba(0,0,0,0.15);">
+            <div>
+                <div class="status-pill {css}">{title}</div>
+                <div class="small-muted">{desc}</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
 def show_cat_gallery():
     st.markdown(f"""
     <div class="cat-gallery-card">
@@ -783,6 +803,7 @@ if generate_btn:
             progress.progress(i / len(site_ids))
 
         if not generated_files:
+            show_result_cat_card("panic")
             st.error("Tidak ada PDF yang berhasil dibuat.")
             st.subheader("Log")
             st.code("\n".join(log))
@@ -799,6 +820,11 @@ if generate_btn:
         zip_buffer.seek(0)
 
         failed_count = len([x for x in log if x.startswith("FAILED")])
+
+        if failed_count > 0:
+            show_result_cat_card("angry")
+        else:
+            show_result_cat_card("happy")
 
         c1, c2, c3 = st.columns(3)
         c1.metric("Berhasil", len(generated_files))
