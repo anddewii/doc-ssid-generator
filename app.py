@@ -62,7 +62,7 @@ CAT_SLEEPY = "https://media1.tenor.com/m/Xn3TfHpAJiMAAAAd/scuba-cat-scuba.gif"
 # ============================================================
 
 st.set_page_config(
-    page_title="RTGS Report Generator",
+    page_title="SSID RTGS Report Generator",
     page_icon="🐱",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -275,7 +275,7 @@ def show_hero(status="sleepy"):
     # Bagian status kucing di bawah judul DIHAPUS sesuai request.
     # Parameter status tetap dibiarkan supaya bagian preview/generate tidak perlu diubah banyak.
     st.markdown("""
-    <div class="hero-title">🐱 RTGS Report Generator</div>
+    <div class="hero-title">🐱 SSID RTGS Report Generator</div>
     <div class="hero-caption">Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive</div>
     """, unsafe_allow_html=True)
 
@@ -287,7 +287,7 @@ def show_result_cat_card(status="sleepy"):
     img, title, desc, css = get_cat_status(status)
     st.markdown(f"""
     <div class="glass-card">
-        <div class="hero-title">🐱 RTGS Report Generator</div>
+        <div class="hero-title">🐱 SSID RTGS Report Generator</div>
         <div class="hero-caption">Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive</div>
         <div style="display:flex; gap:26px; align-items:center; flex-wrap:wrap; margin-top:20px;">
             <img src="{img}" style="width:165px;height:165px;object-fit:cover;border-radius:24px;box-shadow:0 12px 28px rgba(0,0,0,0.15);">
@@ -887,7 +887,7 @@ if generate_btn:
         st.download_button(
             label="⬇️ Download ZIP",
             data=zip_buffer,
-            file_name="RTGS_REPORT_RESULT.zip",
+            file_name="SSID RTGS_REPORT_RESULT.zip",
             mime="application/zip",
             use_container_width=True
         )
