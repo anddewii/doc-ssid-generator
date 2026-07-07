@@ -180,20 +180,11 @@ def get_cat_status(status):
 
 
 def show_hero(status="sleepy"):
-    img, title, desc, css = get_cat_status(status)
-
-    st.markdown(f"""
-    <div class="glass-card">
-        <div class="hero-title">🐱 RTGS Report Generator</div>
-        <div class="hero-caption">Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive</div>
-        <div style="display:flex; gap:24px; align-items:center; flex-wrap:wrap;">
-            <img src="{img}" class="cat-img">
-            <div>
-                <div class="status-pill {css}">{title}</div>
-                <div class="small-muted">{desc}</div>
-            </div>
-        </div>
-    </div>
+    # Bagian status kucing di bawah judul DIHAPUS sesuai request.
+    # Parameter status tetap dibiarkan supaya bagian preview/generate tidak perlu diubah banyak.
+    st.markdown("""
+    <div class="hero-title">🐱 RTGS Report Generator</div>
+    <div class="hero-caption">Generate PDF Perubahan SSID AP1 dari Google Sheet + Google Drive</div>
     """, unsafe_allow_html=True)
 
 
@@ -656,8 +647,6 @@ def generate_pdf(site, work_dir, output_dir):
 show_hero("sleepy")
 show_cat_gallery()
 
-st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-
 site_input = st.text_area(
     "Masukkan Site ID maksimal 50",
     height=170,
@@ -668,11 +657,7 @@ site_ids_now = parse_site_input(site_input)
 unique_count = len(set(site_ids_now))
 duplicate_count = len(site_ids_now) - unique_count
 
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("Site input", len(site_ids_now))
-m2.metric("Limit", MAX_SITE)
-m3.metric("Duplikat", duplicate_count)
-m4.metric("Database row", len(df))
+# Bagian metric/card Site Input, Limit, Duplikat, Database row DIHAPUS sesuai request.
 
 col1, col2 = st.columns(2)
 
@@ -681,8 +666,6 @@ with col1:
 
 with col2:
     generate_btn = st.button("🚀 Generate PDF", type="primary", use_container_width=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 
 if preview_btn:
@@ -706,9 +689,6 @@ if preview_btn:
 
         has_error = any(row["Status"] != "😺 Ready" for row in preview_data)
 
-        show_hero("angry" if has_error else "happy")
-
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("📋 Preview Site Lengkap Sebelum Generate")
         st.dataframe(preview_data, use_container_width=True, hide_index=True)
 
@@ -716,8 +696,6 @@ if preview_btn:
             st.warning("Ada site yang perlu dicek. Perhatikan kolom Before/After/Grafik dan Catatan.")
         else:
             st.success("Semua site siap generate PDF.")
-
-        st.markdown('</div>', unsafe_allow_html=True)
 
 
 if generate_btn:
@@ -736,7 +714,6 @@ if generate_btn:
     generated_files = []
     log = []
 
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader("🚀 Proses Generate PDF")
 
     progress = st.progress(0)
@@ -769,11 +746,9 @@ if generate_btn:
             progress.progress(i / len(site_ids))
 
         if not generated_files:
-            show_hero("panic")
             st.error("Tidak ada PDF yang berhasil dibuat.")
             st.subheader("Log")
             st.code("\n".join(log))
-            st.markdown('</div>', unsafe_allow_html=True)
             st.stop()
 
         zip_buffer = io.BytesIO()
@@ -787,8 +762,6 @@ if generate_btn:
         zip_buffer.seek(0)
 
         failed_count = len([x for x in log if x.startswith("FAILED")])
-
-        show_hero("angry" if failed_count else "happy")
 
         c1, c2, c3 = st.columns(3)
         c1.metric("Berhasil", len(generated_files))
@@ -807,5 +780,3 @@ if generate_btn:
 
         st.subheader("Log")
         st.code("\n".join(log))
-
-    st.markdown('</div>', unsafe_allow_html=True)
