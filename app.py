@@ -40,12 +40,12 @@ BEFORE_RECT = fitz.Rect(55, 100, 540, 360)
 AFTER_RECT = fitz.Rect(55, 465, 540, 705)
 
 # PAGE 3
-# Jika hanya 1 grafik
-GRAFIK_SINGLE_RECT = fitz.Rect(20, 40, 575, 525)
+GRAFIK_TITLE_CLEAR_RECT = fitz.Rect(45, 45, 570, 85)
+GRAFIK_TITLE_RECT = fitz.Rect(55, 55, 560, 80)
 
-# Jika ada 2 grafik
-GRAFIK_1_RECT = fitz.Rect(15, 20, 580, 360)
-GRAFIK_2_RECT = fitz.Rect(15, 345, 580, 685)
+GRAFIK_SINGLE_RECT = fitz.Rect(30, 90, 565, 600)
+GRAFIK_1_RECT = fitz.Rect(30, 90, 565, 365)
+GRAFIK_2_RECT = fitz.Rect(30, 385, 565, 660)
 
 # CAT GIF
 CAT_ANGRY = "https://media1.tenor.com/m/Pq5EqV3tfrMAAAAC/cat-scream-cat-screaming.gif"
@@ -585,7 +585,7 @@ def insert_image(page, image_path, rect):
         rect,
         filename=str(image_path),
         keep_proportion=True,
-        overlay=False
+        overlay=True,
     )
 
 
@@ -929,14 +929,33 @@ def generate_pdf(site, work_dir, output_dir):
         page_2 = doc[1]
         insert_image(page_2, before_path, BEFORE_RECT)
         insert_image(page_2, after_path, AFTER_RECT)
-
         page_3 = doc[2]
 
+        # Tutup judul lama dari template agar tidak bertabrakan dengan grafik
+        page_3.draw_rect(
+            GRAFIK_TITLE_CLEAR_RECT,
+            color=(1, 1, 1),
+            fill=(1, 1, 1),
+            overlay=True,
+        )
+
+        # Masukkan grafik
         if has_two_grafik:
             insert_image(page_3, grafik_1_path, GRAFIK_1_RECT)
             insert_image(page_3, grafik_2_path, GRAFIK_2_RECT)
         else:
             insert_image(page_3, grafik_single_path, GRAFIK_SINGLE_RECT)
+
+        # Tulis ulang judul setelah grafik dimasukkan
+        page_3.insert_textbox(
+            GRAFIK_TITLE_RECT,
+            "C. Capture Monitoring Traffic",
+            fontsize=13,
+            fontname="Helvetica-Bold",
+            color=(0, 0, 0),
+            align=0,
+            overlay=True,
+        )
 
         doc.save(
             str(output_pdf),
