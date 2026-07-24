@@ -585,7 +585,7 @@ def insert_image(page, image_path, rect):
         rect,
         filename=str(image_path),
         keep_proportion=True,
-        overlay=True,
+        overlay=False
     )
 
 
