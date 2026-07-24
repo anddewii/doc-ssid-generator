@@ -40,9 +40,12 @@ BEFORE_RECT = fitz.Rect(55, 100, 540, 360)
 AFTER_RECT = fitz.Rect(55, 465, 540, 705)
 
 # PAGE 3
-GRAFIK_SINGLE_RECT = fitz.Rect(35, 70, 560, 500)
-GRAFIK_1_RECT = fitz.Rect(35, 70, 560, 330)
-GRAFIK_2_RECT = fitz.Rect(35, 350, 560, 610)
+# Jika hanya 1 grafik
+GRAFIK_SINGLE_RECT = fitz.Rect(20, 40, 575, 525)
+
+# Jika ada 2 grafik
+GRAFIK_1_RECT = fitz.Rect(20, 40, 575, 365)
+GRAFIK_2_RECT = fitz.Rect(20, 355, 575, 680)
 
 # CAT GIF
 CAT_ANGRY = "https://media1.tenor.com/m/Pq5EqV3tfrMAAAAC/cat-scream-cat-screaming.gif"
