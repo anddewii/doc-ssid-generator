@@ -42,7 +42,7 @@ AFTER_RECT = fitz.Rect(55, 465, 540, 705)
 # PAGE 3
 GRAFIK_SINGLE_RECT = fitz.Rect(35, 70, 560, 500)
 GRAFIK_1_RECT = fitz.Rect(55, 100, 540, 360)
-GRAFIK_2_RECT = fitz.Rect(55, 465, 540, 705)
+GRAFIK_2_RECT = fitz.Rect(40, 465, 540, 705)
 
 # CAT GIF
 CAT_ANGRY = "https://media1.tenor.com/m/Pq5EqV3tfrMAAAAC/cat-scream-cat-screaming.gif"
