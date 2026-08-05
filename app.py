@@ -765,7 +765,7 @@ def get_site_preview(site_id):
 # GENERATE PDF
 # ============================================================
 
-def generate_pdf(site, work_dir, output_dir):
+def generate_pdf(site, work_dir, output_dir, allow_issues=False):
     no_tracker = site["no_tracker"]
     site_id = site["site_id"]
     site_name = site["site_name"]
@@ -784,10 +784,10 @@ def generate_pdf(site, work_dir, output_dir):
         grafik_2_file,
     ) = find_required_images(folder_id)
 
-    if before_file is None:
+    if before_file is None and not allow_issues:
         raise FileNotFoundError("File before tidak ditemukan")
 
-    if after_file is None:
+    if after_file is None and not allow_issues:
         raise FileNotFoundError("File after tidak ditemukan")
 
     has_single_grafik = grafik_single_file is not None
@@ -796,7 +796,7 @@ def generate_pdf(site, work_dir, output_dir):
         and grafik_2_file is not None
     )
 
-    if not has_two_grafik and not has_single_grafik:
+    if not has_two_grafik and not has_single_grafik and not allow_issues:
         if grafik_1_file is not None:
             raise FileNotFoundError(
                 "Grafik 1 ditemukan, tetapi Grafik 2 tidak ditemukan"
@@ -821,23 +821,39 @@ def generate_pdf(site, work_dir, output_dir):
     grafik_1_path = site_work_dir / "grafik_1.png"
     grafik_2_path = site_work_dir / "grafik_2.png"
 
-    download_drive_file(before_file["id"], str(before_path))
-    download_drive_file(after_file["id"], str(after_path))
+    if before_file is not None:
+        download_drive_file(before_file["id"], str(before_path))
+
+    if after_file is not None:
+        download_drive_file(after_file["id"], str(after_path))
 
     if has_two_grafik:
         download_drive_file(grafik_1_file["id"], str(grafik_1_path))
         download_drive_file(grafik_2_file["id"], str(grafik_2_path))
-    else:
+    elif has_single_grafik:
         download_drive_file(grafik_single_file["id"], str(grafik_single_path))
+    elif allow_issues:
+        if grafik_1_file is not None:
+            download_drive_file(grafik_1_file["id"], str(grafik_1_path))
+        if grafik_2_file is not None:
+            download_drive_file(grafik_2_file["id"], str(grafik_2_path))
 
     validation_items = [
         (
             "Before",
-            validate_capture(site_id, before_file, before_path),
+            validate_capture(
+                site_id,
+                before_file,
+                before_path if before_file is not None else None,
+            ),
         ),
         (
             "After",
-            validate_capture(site_id, after_file, after_path),
+            validate_capture(
+                site_id,
+                after_file,
+                after_path if after_file is not None else None,
+            ),
         ),
     ]
 
@@ -862,7 +878,7 @@ def generate_pdf(site, work_dir, output_dir):
                 ),
             ]
         )
-    else:
+    elif has_single_grafik:
         validation_items.append(
             (
                 "Grafik",
@@ -873,6 +889,30 @@ def generate_pdf(site, work_dir, output_dir):
                 ),
             )
         )
+    else:
+        if grafik_1_file is not None:
+            validation_items.append(
+                (
+                    "Grafik 1",
+                    validate_capture(site_id, grafik_1_file, grafik_1_path),
+                )
+            )
+        else:
+            validation_items.append(
+                ("Grafik 1", ("ERROR", "File tidak ditemukan"))
+            )
+
+        if grafik_2_file is not None:
+            validation_items.append(
+                (
+                    "Grafik 2",
+                    validate_capture(site_id, grafik_2_file, grafik_2_path),
+                )
+            )
+        else:
+            validation_items.append(
+                ("Grafik 2", ("ERROR", "File tidak ditemukan"))
+            )
 
     errors = []
 
@@ -880,7 +920,7 @@ def generate_pdf(site, work_dir, output_dir):
         if status == "ERROR":
             errors.append(f"{label} salah: {message}")
 
-    if errors:
+    if errors and not allow_issues:
         raise ValueError(" | ".join(errors))
 
     output_name = clean_filename(
@@ -924,16 +964,24 @@ def generate_pdf(site, work_dir, output_dir):
         )
 
         page_2 = doc[1]
-        insert_image(page_2, before_path, BEFORE_RECT)
-        insert_image(page_2, after_path, AFTER_RECT)
+        if before_file is not None:
+            insert_image(page_2, before_path, BEFORE_RECT)
+
+        if after_file is not None:
+            insert_image(page_2, after_path, AFTER_RECT)
 
         page_3 = doc[2]
 
         if has_two_grafik:
             insert_image(page_3, grafik_1_path, GRAFIK_1_RECT)
             insert_image(page_3, grafik_2_path, GRAFIK_2_RECT)
-        else:
+        elif has_single_grafik:
             insert_image(page_3, grafik_single_path, GRAFIK_SINGLE_RECT)
+        else:
+            if grafik_1_file is not None:
+                insert_image(page_3, grafik_1_path, GRAFIK_1_RECT)
+            if grafik_2_file is not None:
+                insert_image(page_3, grafik_2_path, GRAFIK_2_RECT)
 
         doc.save(
             str(output_pdf),
@@ -948,7 +996,7 @@ def generate_pdf(site, work_dir, output_dir):
     if not output_pdf.exists():
         raise RuntimeError("File PDF gagal disimpan")
 
-    return str(output_pdf)
+    return str(output_pdf), errors
 
 
 # ============================================================
@@ -963,6 +1011,28 @@ site_input = st.text_area(
     height=170,
     placeholder="AM16224669368205N\nAM16224669328205N",
 )
+
+issue_action = st.radio(
+    "Jika file Before/After/Grafik tidak ada atau tidak sesuai:",
+    options=[
+        "Hentikan site yang bermasalah (disarankan)",
+        "Tetap lanjutkan dan buat PDF",
+    ],
+    index=0,
+    help=(
+        "Jika tetap dilanjutkan, file yang tersedia akan tetap dipakai. "
+        "Bagian yang filenya tidak ada akan dibiarkan kosong dan semua "
+        "masalah dicatat di log.txt."
+    ),
+)
+
+allow_issues = issue_action == "Tetap lanjutkan dan buat PDF"
+
+if allow_issues:
+    st.warning(
+        "⚠️ Mode lanjut aktif: PDF tetap dibuat meskipun ada file yang "
+        "hilang atau terindikasi tidak sesuai. Periksa log setelah proses."
+    )
 
 col_1, col_2 = st.columns(2)
 
@@ -1075,18 +1145,26 @@ if generate_btn:
                         "Site ID tidak ditemukan di database"
                     )
                 else:
-                    pdf_path = generate_pdf(
+                    pdf_path, warnings = generate_pdf(
                         site,
                         work_dir,
                         output_dir,
+                        allow_issues=allow_issues,
                     )
 
                     generated_files.append(pdf_path)
 
-                    log_entries.append(
-                        f"DONE - {site_id}: "
-                        f"{os.path.basename(pdf_path)}"
-                    )
+                    if warnings:
+                        log_entries.append(
+                            f"DONE WITH WARNING - {site_id}: "
+                            f"{os.path.basename(pdf_path)} | "
+                            f"{' | '.join(warnings)}"
+                        )
+                    else:
+                        log_entries.append(
+                            f"DONE - {site_id}: "
+                            f"{os.path.basename(pdf_path)}"
+                        )
 
             except Exception as error:
                 log_entries.append(
