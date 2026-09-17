@@ -31,9 +31,9 @@ COL_FOLDER_LINK = 17  # Kolom R
 MAX_SITE = 50
 
 # COVER
-COVER_CLEAR_RECT = fitz.Rect(35, 350, 560, 485)
-COVER_LINE_1_RECT = fitz.Rect(60, 405, 540, 435)
-COVER_LINE_2_RECT = fitz.Rect(60, 435, 540, 475)
+COVER_CLEAR_RECT = fitz.Rect(35, 350, 560, 505)
+COVER_LINE_1_RECT = fitz.Rect(60, 395, 540, 425)
+COVER_LINE_2_RECT = fitz.Rect(60, 428, 540, 500)
 
 # PAGE 2
 BEFORE_RECT = fitz.Rect(55, 100, 540, 360)
@@ -956,7 +956,7 @@ def generate_pdf(site, work_dir, output_dir, allow_issues=False):
         page_1.insert_textbox(
             COVER_LINE_2_RECT,
             site_name,
-            fontsize=16,
+            fontsize=12,
             fontname="helv",
             align=1,
             color=(0, 0, 0),
